@@ -1,0 +1,55 @@
+﻿@page "/eliminar/{Id:int}"
+@using Microsoft.Extensions.Logging
+@using ContenidoBlazor.Models
+@using System.Net.Http
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager nav
+
+<h2>ELIMINAR CONTENIDO</h2>
+   <h4>Desea Eliminar el Contenido </h4>
+    <div class="container-fluid">
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="inputTitulo">Titulo</label>
+          <input type="text" class="form-control"  id="inputTitulo" @bind="@cont.Titulo" placeholder="Titulo">
+        </div>
+       </div>
+        <div class="form-group row mb-1">
+            <div class="col-sm-6">
+            <button class="btn btn-primary" @onclick="Cancelar">Cancelar</button>  
+            </div>
+            <div class="col-sm-6">
+            <button class="btn btn-primary" @onclick="Delete">Eliminar</button>  
+            </div>
+        </div>
+    </div>
+    
+
+ 
+    
+@code {
+    [Parameter]
+    public int Id{get; set; }
+    private Contenido cont = new Contenido();
+    public string Url = "/api/Contenidoes";
+    private async Task Delete()
+    
+    {
+        await Http.DeleteAsync(Url+"/"+Id);
+        nav.NavigateTo("/contenidopage");
+
+    }
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/contenidopage");
+    }
+
+    protected override async Task OnInitializedAsync(){
+        if(Id !=0 ){
+            cont = await Http.GetFromJsonAsync<Contenido>(Url+"/"+Id);
+        } 
+    }
+
+}

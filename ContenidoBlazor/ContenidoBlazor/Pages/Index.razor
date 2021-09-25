@@ -1,0 +1,64 @@
+﻿@page "/"
+
+
+@using ContenidoBlazor.Models
+@using System.Net.Http
+@using System.Net.Http.Json
+@inject HttpClient Http
+
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+
+
+
+
+<h1>CREADORES.UY</h1>
+
+BIENVENIDO A CREADORES.UY
+<!-- 
+    <div id="cantEntidades">
+       <p>Hola a todos</p>
+       <p>@cantidad1</p> 
+    </div>    
+-->
+
+
+@code{
+    //Desde aca comienza el ejercicio 6
+/*
+    private List<Contenido> contenidoList = new List<Contenido>();
+    public string Url = "/api/Contenidoes";
+    private HubConnection hubConnection;
+    string cantidad1;
+    protected override async Task OnInitializedAsync()
+    {
+        contenidoList = await Http.GetFromJsonAsync<List<Contenido>>(Url);
+            
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/contenidohub"))
+            .Build();
+
+        hubConnection.On<int >("CantEntidades", ( contador) =>
+        {
+        //Recibe los datos del hub
+            var cantidad = $"{contador}";
+            
+            cantidad1 = cantidad;
+            StateHasChanged();
+            
+        });
+
+        await hubConnection.StartAsync(); //Inicializa la coneccion
+      //  Send();
+        await hubConnection.SendAsync("cantidadEntidades", contenidoList.Count());
+     //Envia el estado del nav actual a los demas 
+    }
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+    */    
+}

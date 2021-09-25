@@ -1,0 +1,109 @@
+﻿@page "/contenidopage"
+
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+
+@using ContenidoBlazor.Models
+@using System.Net.Http
+@using System.Net.Http.Json
+@inject HttpClient Http
+
+    <div id="cantEntidades">
+        <p>Contenidos disponibles: @cantidad1</p>
+    </div>    
+
+
+    @if (contenidoList == null){
+{
+    <p><em>Nada que mostrar por aquí...</em></p>
+}
+    }
+    else
+    {
+    <h3>Lista de Contenidos Disponibles </h3>
+    <div class="row">
+        <a href="crear">
+            Nuevo
+        </a>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>TITULO</td>
+                    <td>AUTOR</td>
+                    <td>DESCRIPCION</td>
+                    <td>CATEGORIA</td>
+                    <td>TIPO DE CONTENIDO</td>
+                    <td>PUBLICADO</td>
+                </tr>
+            </thead>
+
+            <tbody>
+            @foreach(var cont in contenidoList)
+            {
+                <tr>
+                    <td>@cont.Titulo</td>
+                    <td>@cont.Autor</td>
+                    <td>@cont.Descripcion</td>
+                    <td>@cont.Categoria</td>
+                    <td>@cont.TipoContendio</td>
+                    <td>@cont.FechaPublicacion</td>
+                    <td>
+                    <a href="/editar/@cont.Id">Edit</a> 
+                    <a href="/eliminar/@cont.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+    
+            </tbody>
+        </table>
+    </div>
+    }
+    
+
+@code {
+    private List<Contenido> contenidoList = new List<Contenido>();
+    public string Url = "/api/Contenidoes"; //Servicio de la API de donde va a traer los datos
+    
+    /*
+    protected override async Task OnInitializedAsync()
+                => contenidoList = await Http.GetFromJsonAsync<List<Contenido>>(Url);
+    */
+
+    private HubConnection hubConnection;
+    string cantidad1;
+    protected override async Task OnInitializedAsync()
+    {
+        contenidoList = await Http.GetFromJsonAsync<List<Contenido>>(Url);
+            
+        //Construyo la conexion con el hub
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/contenidohub"))
+            .Build();
+
+        hubConnection.On<int >("CantEntidades", ( contador) =>
+        {
+        //Recibe los datos del hub, la conexion del hub empieza a "escuchar" 
+        //CantEntidades -> deben estar escuchando los clientes para poder recibir el dato en RT
+            var cantidad = $"{contador}";
+            //Gurdo el valor recibido de cada cliente 
+            cantidad1 = cantidad;
+            StateHasChanged(); //Cambia el estado al recibir el dato, por lo tanto vuelve a renderizar el componente
+            //para poder ver el valor
+            
+        });
+        //1-contruye la conexion, 2- le decimos que tiene que estar escuchando y de donde
+        await hubConnection.StartAsync(); // 3- es momento de Inicializar la conexion
+      
+        await hubConnection.SendAsync("cantidadEntidades", contenidoList.Count());
+        //Envia la cantidad al servidor (HUB) 
+    }
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

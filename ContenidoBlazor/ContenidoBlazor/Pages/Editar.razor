@@ -1,0 +1,70 @@
+﻿@page "/editar/{Id:int}"
+
+@using Microsoft.Extensions.Logging
+@using ContenidoBlazor.Models
+@using System.Net.Http
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager nav
+
+<h3>Editar Contenido: @cont.Titulo </h3>
+
+    <div class="container-fluid">
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="inputTitulo">Titulo</label>
+          <input type="text" class="form-control"  id="inputTitulo" @bind="@cont.Titulo" placeholder="Titulo">
+        </div>
+        <div class="form-group col-md-6">
+          <label for="inputAutor">Autor</label>
+          <input type="text" class="form-control" id="inputAutor" @bind="@cont.Autor" placeholder="Autor">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputDescripcion">Descripcion</label>
+        <input type="text" class="form-control" id="inputDescripcion" @bind="@cont.Descripcion" placeholder="Breve descripcion...">
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label for="inputCategoria">Categoria</label>
+          <input type="text" class="form-control" id="inputCategoria" @bind="@cont.Categoria" placeholder="Categoria">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="inputTipoContenido">Tipo Contenido</label>
+          <input type="text" class="form-control" id="inputTipoContenido" @bind="@cont.TipoContendio" placeholder="Tipo Contenido...">
+        </div>    
+        <div class="form-group col-md-4">
+            <label asp-for="FechaPublicacion" class="control-label">Fecha publicacion</label>
+            <input type="date" class="form-control" @bind="@cont.FechaPublicacion" />
+        </div>
+      </div>
+      
+      <div class="form-group row mb-1">
+        <div class="col-sm-12">
+            <button class="btn btn-primary" @onclick="Guardar">Guardar</button>  
+        </div>
+      </div>
+    </div>
+    
+
+ 
+    
+@code {
+    [Parameter]
+    public int Id{get; set; }
+    private Contenido cont = new Contenido();
+    public string Url = "/api/Contenidoes";
+    private async Task Guardar()
+    {
+        await Http.PutAsJsonAsync<Contenido>(Url+"/"+Id, cont);
+        nav.NavigateTo("/contenidopage");
+
+    }
+
+    protected override async Task OnInitializedAsync(){
+        if(Id !=0 ){
+            cont = await Http.GetFromJsonAsync<Contenido>(Url+"/"+Id);
+        } 
+    }
+
+}
